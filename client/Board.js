@@ -16,18 +16,15 @@ function Board(service) {
         this.jsonDeSquare;
     };
 
-    this.getMovePublics = function () {
-        this.jsonDeToken;
-        this.jsonDeSquare;
+    this.getMovePublics = function (token, square) {
+        this.tokenJson;
+        this.squareJson;
     };
 
-    this.sendBuildPublics = function () {
-        this.token;
-        this.square;
-    };
+    this.sendBuildPublics = function (token, square) { };
 
-    this.getBuildPublics = function () {
-        this.jsonDeSquare;
+    this.getBuildPublics = function (square) {
+        this.squareJson;
     }
 
 
