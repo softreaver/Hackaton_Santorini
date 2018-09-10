@@ -1,20 +1,42 @@
+"use strict";
 
 var GameControler = GameControler || {};
 
+window.onload = () => GameControler.initGame();
+
 (function (publics) {
+
     let privates = {};
 
-    publics.maMethode = function () {
+    publics.initGame = function () {
+        privates.socketIoUtils = new SocketIoUtils();
 
     };
 
-    privates.maMethodePrive = function () {
-        return privates.att2;
+    publics.moveToken = function () {
+        this.square = "Square";
+        this.token = "Token";
+
     };
 
-    publics.att1 = 'salut';
+    publics.build = function () {
+        this.square = "Square";
 
-    privates.att2 = 'salut';
+    };
 
+    publics.victory = function () {
+        this.player = "Player";
+
+    };
+
+    publics.init = function () { };
+    publics.playerConnect = function () { };
+    publics.playerLeave = function () { };
+    publics.yourTurn = function () { };
+    publics.opponentTurn = function () {
+
+        this.player = "Player";
+
+    };
 
 }(GameControler));
