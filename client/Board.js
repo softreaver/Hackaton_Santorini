@@ -1,17 +1,8 @@
 "use strict";
 
-"use strict";
-
-function Board(service) {
-    let playersList = [];
-    let tokenList = [];
-    let squareList = [];
-    let buildingList = [];
-
-
-    // let att1 = service;
-
-    // this.att2;// publics
+function Board(initSquaresList, initPlayersList) {
+    let playersList = initPlayersList;
+    let squaresList = initSquaresList;
 
     this.sendMovePublics = function (token, square) {
         this.tokenJsonDeToken;

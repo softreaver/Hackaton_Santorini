@@ -1,7 +1,12 @@
 "use strict";
 
-function SocketIoUtils() {
-    let socket = io.connect();
+var SocketIoUtils = SocketIoUtils || {};
+
+(function (publics) {
+
+    let privates = privates || {
+        socket: io.connect()
+    };
 
     socket.on('connect_error', error => {
         console.log(error);
@@ -26,4 +31,5 @@ function SocketIoUtils() {
     this.turnOfPublics = function (playerJson) { }
     this.victoryPublics = function (playerJson) { }
 
-}
+
+}(SocketIoUtils));
