@@ -1,4 +1,5 @@
 "use strict";
+
 function SocketIoUtils() {
     let socket = io.connect();
 
