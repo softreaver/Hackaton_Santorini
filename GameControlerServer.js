@@ -1,9 +1,12 @@
+"use strict";
+
 // Import des modules node.js
 
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
+var boardServer = new BoardServer();
 
 // On va écouter sur le port 80
 server.listen(80);
@@ -68,9 +71,13 @@ io.on('connection', function (socket) {
     socket.emit(`hello`, 'You have been connected !');
 
     // Evenement pour la méthode moveToken
-    socket.on('moveToken', function (TokenJson, squareJson) {
-        console.log(`Ask for deplacement`);
-        // En attente du BoardServer
+    socket.on('moveToken', function (tokenJson, squareJson) {
+        console.log(`MoveToken => token = ` + tokenJson + ' square = ' + squareJson);
+
+        let token = JSON.parse(tokenJson);
+        let square = JSON.parse(squareJson);
+
+        boardServer.moveToken(token, square);
     });
     // Evenement pour la méthode build
     socket.on('build', function (TokenJson, squareJson) {

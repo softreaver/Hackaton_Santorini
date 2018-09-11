@@ -2,7 +2,7 @@
 
 function Building() {
 
-    let level;
+    let level = 1;
     let square = null;
     const IMAGE_URL = "../img/buildingLvl";
 
