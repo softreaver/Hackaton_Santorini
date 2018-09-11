@@ -11,7 +11,7 @@ function BoardServer() {
         // Condition si le token n'est pas null
         if (tokens !== null) {
             if (square !== null) {
-                if ("le deplacement n'est pas null") {
+                if ("le deplacement est null") {
                     console.log(`There is a problem with your deplacement null`);
                 } else {
                     if ("Le deplacement est au dessus de 2 - condition +1 -1") {
