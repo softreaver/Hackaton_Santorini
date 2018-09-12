@@ -4,7 +4,7 @@ function Building() {
 
     let level = 1;
     let square = null;
-    const IMAGE_URL = "../img/buildingLvl";
+    let imageUrl = "../img/buildingLvl";
 
     // Getter
     this.getLevel = function () {
@@ -28,17 +28,36 @@ function Building() {
         square = newSquare;
     }
 
+    this.setImageUrl = function(newUrl) {
+        imageUrl = newUrl;
+    }
+
     // Methodes
     this.build = function () {
         level++;
     }
 
+}
 
-    // Parse un objet 
-    this.parseBuildingWithMethod = function () {
+// Parse un objet 
+Building.parse = function (building) {
+    let newBuilding = new Building();
+    newBuilding.setLevel(building.level);
+    newBuilding.setSquare(Square.parse(building.square));
+    newBuilding.setImageUrl(building.imageUrl);
 
+    return newBuilding;
+}
+
+// Serialiser un objet en JSON
+Building.stringify = function (building) {
+    let newBuilding = {
+        level: building.getLevel(),
+        square: building.getSquare(),
+        imageUrl: building.getImageUrl()
     }
 
+    return JSON.stringify(newBuilding);
 }
 
 

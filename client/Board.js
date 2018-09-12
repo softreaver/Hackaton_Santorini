@@ -2,13 +2,11 @@
 
 function Board(initSquaresList, initPlayersList) {
     let activePlayer = null;
-
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
 
     this.sendMove = function (token, square) {
-        this.tokenJsonDeToken;
-        this.jsonDeSquare;
+        SocketIoUtils.sendMoveToken(token, square);
     }
 
     this.getMove = function (token, square) {
@@ -53,16 +51,16 @@ function Board(initSquaresList, initPlayersList) {
 
     }
 
-    this.setTokenList = function () { 
-
-    }
-
     this.setSquareList = function () {
 
      }
 
-    this.setBuildingList = function () { 
+    this.setActivePlayer = function(newPlayer) {
+        activePlayer = newPlayer;
+    }
 
+    this.getActivePlayer = function() {
+        return activePlayer;
     }
 
     this.addPlayer = function (player) {
@@ -73,38 +71,51 @@ function Board(initSquaresList, initPlayersList) {
 
     }
 
-    $("canvas").on('mouseleave', function () { Player });
+}
 
-    server.on('close', function () {
-        // Faire quelque chose quand le serveur est arrêté
-    })
+// Parse un objet 
+Board.parse = function (board) {
+    let squaresList = [];
+    let squaresObjList = board.squaresList;
 
-    let http = require('http');
+    let playersList = [];
+    let playersObjList = board.playersList;
 
-    let server = http.createServer(function (req, res) {
-        res.writeHead(200);
-        res.end('Hello Everybody !');
-    });
+    for(let squareJson of squaresObjList) {
+        squaresList.push(Square.parse(squareJson));
+    }
 
-    server.on('close', function () { // On écoute l'évènement close
-        console.log('Bye bye !');
-    })
+    for(let playerJson of playersObjList) {
+        playersList.push(Player.parse(playerJson));
+    }
 
-    server.listen(8080); // Démarre le serveur
+    let newBoard = new Board(squaresList, playersList);
+    newBoard.setActivePlayer(board.activePlayer);
 
-    server.close(); // Arrête le serveur. Déclenche l'événement close
+    return newBoard;
+}
 
+// Serialiser un objet en JSON
+Board.stringify = function (board) {
+    let squaresObjList = [];
+    let squares = board.getSquaresList();
 
+    let playersObjList = [];
+    let players = board.getPlayersList();
 
+    for(let square of squares) {
+        squaresObjList.push(JSON.parse(Square.stringify(square)));
+    }
 
+    for(let player of players) {
+        playersObjList.push(JSON.parse(Player.stringify(player)));
+    }
 
+    let newBoard = {
+        activePlayer: board.getActivePlayer(),
+        playersList: playersObjList,
+        squaresList: squaresObjList
+    }
 
-    let EventEmitter = require('events').EventEmitter;
-    let game = new EventEmitter();
-    game.on('gameover', function (message) {
-        console.log(message);
-    });
-
-    game.emit('gameover', 'Vous avez perdu !');
-
+    return JSON.stringify(newBoard);
 }

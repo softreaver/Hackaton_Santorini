@@ -37,7 +37,9 @@ var SocketIoUtils = SocketIoUtils || {};
         let tokenJson = JSON.stringify(token);
         let squareJson = JSON.stringify(square);
 
-        privates.socket.emit('moveToken', tokenJson, squareJson);
+        privates.socket.emit('moveToken', tokenJson, squareJson, (type, message) => {
+            console.log(type + ': ' + message);
+        });
     };
 
     // envoi d'une demande de construction au serveur
@@ -50,7 +52,7 @@ var SocketIoUtils = SocketIoUtils || {};
 
     // Démarre une partie sur le serveur
     publics.sendInitGame = function(board) {
-        boardJson = JSON.stringify(board);
+        let boardJson = Board.stringify(board);
 
         privates.socket.emit('initGame', boardJson);
     }

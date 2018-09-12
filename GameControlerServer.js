@@ -75,16 +75,22 @@ app.get('/model/:fileName', (req, resp) => {
 // Evenement pour la méthode de Connection
 io.on('connection', function (socket) {
     console.log(`An user just connect `);
-    socket.emit(`hello`, 'You have been connected !');
 
     // Evenement pour la méthode moveToken
-    socket.on('moveToken', function (tokenJson, squareJson) {
+    socket.on('moveToken', function (tokenJson, squareJson, ret) {
         console.log(`MoveToken => token = ` + tokenJson + ' square = ' + squareJson);
 
         let token = JSON.parse(tokenJson);
         let square = JSON.parse(squareJson);
 
-        boardServer.moveToken(token, square);
+        try {
+            boardServer.moveToken(token, square);
+            socket.broadcast.emit('moveToken', tokenJson, squareJson);
+            ret('ok');
+        } catch (error) {
+            console.error('error : ' + error.message);
+            ret('error', "Le déplacement est interdit");
+        }
     });
     // Evenement pour la méthode build
     socket.on('build', function (TokenJson, squareJson) {
@@ -93,7 +99,7 @@ io.on('connection', function (socket) {
     });
     // Evènement pour l'initialisation du jeu
     socket.on('initGame', function (boardJson) {
-        console.log(`Begin game `);
+        console.log(`[Init game] => board = ` + boardJson);
     })
 });
 

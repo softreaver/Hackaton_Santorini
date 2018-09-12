@@ -86,7 +86,5 @@ window.onload = () => GameControler.initGame();
     publics.positionToken = function(token, square) {
 
     }
-    
-    console.log('boum')
 
 }(GameControler));

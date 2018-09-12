@@ -54,6 +54,35 @@ function Player(id) {
     }
 }
 
+// Parse un objet 
+Player.parse = function (player) {
+    let newPlayer = new Player(player.ID);
+    newPlayer.setPseudo(building.level);
+    for(let token of player.tokensList){
+        newPlayer.addToken(Token.parse(token));
+    }
+
+    return newPlayer;
+}
+
+// Serialiser un objet en JSON
+Player.stringify = function (player) {
+    let tokensObjList = [];
+    let tokens = player.getTokensList();
+
+    for(let token of tokens) {
+        tokensObjList.push(JSON.parse(Token.stringify(token)));
+    }
+
+    let newPlayer = {
+        ID: player.getID(),
+        pseudo: player.getPseudo(),
+        tokensList: tokensObjList
+    }
+
+    return JSON.stringify(newPlayer);
+}
+
 if (typeof window === "undefined") {
     module.exports = Player;
 }
