@@ -2,17 +2,16 @@
 
 var GameControler = GameControler || {};
 
-window.onload = () => console.log(GameControler);
+window.onload = () => GameControler.initGame();
 
 (function (publics) {
 
     let privates = {};
-    privates.socketIoUtils = new SocketIoUtils();
     privates.board = null;
 
     publics.initGame = function () {
         // Connexion socket au serveur
-        SocketIoUtils.connect('192.168.10.105');
+        SocketIoUtils.connect();
 
         //Création de deux joueurs fictifs
         let PlayersList = [];

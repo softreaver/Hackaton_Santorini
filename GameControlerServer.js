@@ -40,7 +40,7 @@ app.get('/client/:fileName', (req, resp) => {
     let ip = req.connection.remoteAddress;
     let fileName = req.params.fileName;
     console.log(`[${ip}] asked for ${fileName}.`);
-    resp.sendfile(__dirname + '/client/' + fileName);
+    resp.sendFile(__dirname + '/client/' + fileName);
 });
 
 // Récupère les fichiers Css 
@@ -48,7 +48,7 @@ app.get('/css/:fileName', (req, resp) => {
     let ip = req.connection.remoteAddress;
     let fileName = req.params.fileName;
     console.log(`[${ip}] asked for ${fileName}.`);
-    resp.sendfile(__dirname + '/css/' + fileName);
+    resp.sendFile(__dirname + '/css/' + fileName);
 });
 
 // Récupère les fichiers dans le dossier images
@@ -56,7 +56,7 @@ app.get('/img/:fileName', (req, resp) => {
     let ip = req.connection.remoteAddress;
     let fileName = req.params.fileName;
     console.log(`[${ip}] asked for ${fileName}.`);
-    resp.sendfile(__dirname + '/img/' + fileName);
+    resp.sendFile(__dirname + '/img/' + fileName);
 });
 
 // Récupere les fichiers dans le dossier Model
@@ -64,7 +64,7 @@ app.get('/model/:fileName', (req, resp) => {
     let ip = req.connection.remoteAddress;
     let fileName = req.params.fileName;
     console.log(`[${ip}] asked for ${fileName}.`);
-    resp.sendfile(__dirname + '/model/' + fileName);
+    resp.sendFile(__dirname + '/model/' + fileName);
 });
 
 // -------------------------------------------------------------------------

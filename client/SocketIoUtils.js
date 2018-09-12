@@ -1,90 +1,94 @@
 "use strict";
 
-function SocketIoUtils() {
+var SocketIoUtils = SocketIoUtils || {};
 
-    let socket = io({
-            autoConnect: false
-        });
+(function (publics) {
 
-    this.isConnected = function() {
+    let privates = {};
+
+    privates.socket = io({
+        autoConnect: false
+    });
+
+    publics.isConnected = function() {
         return socket.connected;
     }
 
-    this.connect = function(address, port) {
+    publics.connect = function(address, port) {
          address = address || '';
          port = port || '';
 
          port = (port !== '') ? ':' + port : port;
-        socket.open(address + port);
+         privates.socket.open(address + port);
     }
 
     // si le client est déconnecté du serveur
-    socket.on('disconnect', () => {
+    privates.socket.on('disconnect', () => {
 
     });
 
     // La conneciton au serveur échoue
-    socket.on('connect_error', error => {
+    privates.socket.on('connect_error', error => {
         console.log(error);
     });
 
     // envoi une demande de mouvement au serveur
-    this.sendMoveToken = function (token, square) {
+    publics.sendMoveToken = function (token, square) {
         let tokenJson = JSON.stringify(token);
         let squareJson = JSON.stringify(square);
 
-        socket.emit('moveToken', tokenJson, squareJson);
+        privates.socket.emit('moveToken', tokenJson, squareJson);
     };
 
     // envoi d'une demande de construction au serveur
-    this.sendBuild = function (token, square) {
+    publics.sendBuild = function (token, square) {
         let tokenJson = JSON.stringify(token);
         let squareJson = JSON.stringify(square);
 
-        socket.emit('build', tokenJson, squareJson);
+        privates.socket.emit('build', tokenJson, squareJson);
     }
 
     // Démarre une partie sur le serveur
-    this.sendInitGame = function(board) {
+    publics.sendInitGame = function(board) {
         boardJson = JSON.stringify(board);
 
-        socket.emit('initGame', boardJson);
+        privates.socket.emit('initGame', boardJson);
     }
 
     // Déplacement d'un pion
-    socket.on('moveToken', (tokenJson, squareJson) => {
+    privates.socket.on('moveToken', (tokenJson, squareJson) => {
         
     });
 
     // Construction ou amélioration d'un bâtiment
-    socket.on('build', (tokenJson, squareJson) => {
+    privates.socket.on('build', (tokenJson, squareJson) => {
 
     });
 
     // Positionnement d'un pion
-    socket.on('positionToken', (tokenJson, squareJson) => {
+    privates.socket.on('positionToken', (tokenJson, squareJson) => {
 
     });
 
     // Connection d'un joueur
-    socket.on('playerConnect', playerJson => {
+    privates.socket.on('playerConnect', playerJson => {
 
     });
 
     // Déconnection d'un joueur
-    socket.on('playerLeave', playerJson => {
+    privates.socket.on('playerLeave', playerJson => {
 
     });
 
     // Début du tour d'un joueur
-    socket.on('turnOf', playerJson => {
+    privates.socket.on('turnOf', playerJson => {
 
     });
 
     // Victoir d'un joueur
-    socket.on('victory', playerJson => {
+    privates.socket.on('victory', playerJson => {
 
     });
 
-}
 
+}(SocketIoUtils));

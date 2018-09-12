@@ -1,34 +1,5 @@
 "use strict";
 
-<<<<<<< HEAD
-function Board(service) {
-    let playersList = [];
-    let tokenList = [];
-    let squareList = [];
-    let buildingList = [];
-
-
-    // let att1 = service;
-
-    // this.att2;// publics
-
-    this.sendMovePublics = function (token, square) {
-        this.tokenJsonDeToken;
-        this.jsonDeSquare;
-    };
-
-    this.getMovePublics = function (token, square) {
-        this.tokenJson;
-        this.squareJson;
-    };
-
-    this.sendBuildPublics = function (token, square) { };
-
-    this.getBuildPublics = function (square) {
-        this.squareJson;
-    }
-
-=======
 function Board(initSquaresList, initPlayersList) {
     let activePlayer = null;
 
@@ -69,32 +40,11 @@ function Board(initSquaresList, initPlayersList) {
     /**
      * GETTER / SETTER
      */
->>>>>>> abc7ed605ac54adc28468f5f1ddab4a030569ddf
 
     this.getPlayersList = function () {
         return playersList;
     }
 
-<<<<<<< HEAD
-    this.getTokenList = function () {
-        return tokenList;
-    }
-
-    this.getSquareList = function () {
-        return squareList;
-    }
-
-    this.getBuildingList = function () {
-        return buildingList;
-    }
-
-    this.setPlayerList = function () { }
-    this.setTokenList = function () { }
-    this.setSquareList = function () { }
-    this.setBuildingList = function () { }
-
-
-=======
     this.getSquaresList = function () {
         return squaresList;
     }
@@ -114,20 +64,11 @@ function Board(initSquaresList, initPlayersList) {
     this.setBuildingList = function () { 
 
     }
->>>>>>> abc7ed605ac54adc28468f5f1ddab4a030569ddf
 
     this.addPlayer = function (player) {
         playersList.push(player);
     }
 
-<<<<<<< HEAD
-
-
-
-    this.removePlayer = function (player) {
-
-    }
-=======
     this.removePlayer = function (player) {
 
     }
@@ -166,5 +107,4 @@ function Board(initSquaresList, initPlayersList) {
 
     game.emit('gameover', 'Vous avez perdu !');
 
->>>>>>> abc7ed605ac54adc28468f5f1ddab4a030569ddf
 }
