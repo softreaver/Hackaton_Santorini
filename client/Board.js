@@ -1,55 +1,73 @@
 "use strict";
 
 function Board(initSquaresList, initPlayersList) {
+    let activePlayer = null;
+
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
 
-    this.sendMovePublics = function (token, square) {
+    this.sendMove = function (token, square) {
         this.tokenJsonDeToken;
         this.jsonDeSquare;
-    };
+    }
 
-    this.getMovePublics = function (token, square) {
+    this.getMove = function (token, square) {
         this.tokenJson;
-        this.squareJson;
-    };
-
-    this.sendBuildPublics = function (token, square) { };
-
-    this.getBuildPublics = function (square) {
         this.squareJson;
     }
 
+    this.sendBuild = function (token, square) {
+
+     }
+
+    this.getBuild = function (token, square) {
+        this.squareJson;
+    }
+
+    this.sendPositionToken = function (token, square) {
+
+    }
+
+    this.getPositionToken = function (token, square) {
+
+    }
+
+    this.sendInitGame = function() {
+        SocketIoUtils.sendInitGame(this);
+    }
+
+
+    /**
+     * GETTER / SETTER
+     */
 
     this.getPlayersList = function () {
         return playersList;
     }
 
-    this.getTokenList = function () {
-        return tokenList;
+    this.getSquaresList = function () {
+        return squaresList;
     }
 
-    this.getSquareList = function () {
-        return squareList;
+    this.setPlayerList = function () { 
+
     }
 
-    this.getBuildingList = function () {
-        return buildingList;
+    this.setTokenList = function () { 
+
     }
 
-    this.setPlayerList = function () { }
-    this.setTokenList = function () { }
-    this.setSquareList = function () { }
-    this.setBuildingList = function () { }
+    this.setSquareList = function () {
 
+     }
 
+    this.setBuildingList = function () { 
+
+    }
 
     this.addPlayer = function (player) {
         playersList.push(player);
     }
-
-
-
 
     this.removePlayer = function (player) {
 

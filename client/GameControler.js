@@ -2,15 +2,18 @@
 
 var GameControler = GameControler || {};
 
-window.onload = () => GameControler.initGame();
+window.onload = () => console.log(GameControler);
 
 (function (publics) {
 
-    let privates = privates || {};
+    let privates = {};
     privates.socketIoUtils = new SocketIoUtils();
     privates.board = null;
 
     publics.initGame = function () {
+        // Connexion socket au serveur
+        SocketIoUtils.connect('192.168.10.105');
+
         //Création de deux joueurs fictifs
         let PlayersList = [];
         PlayersList.push(new Player(1));
@@ -36,6 +39,8 @@ window.onload = () => GameControler.initGame();
 
         // Création du plateau de jeu
         privates.board = new Board(squaresList, PlayersList);
+
+        privates.board.sendInitGame();
 
         console.log("Jeu initialisé.")
     };
@@ -70,6 +75,19 @@ window.onload = () => GameControler.initGame();
 
     // On écoute les evennements de l'IHM
 
+
+    publics.sendMove = function(token, square) {
+        privates.board.sendMove(token, square);
+    }
+
+    publics.sendBuild = function(token, square) {
+        privates.board.sendBuild(token, square);
+    }
+
+    publics.positionToken = function(token, square) {
+
+    }
     
+    console.log('boum')
 
 }(GameControler));
