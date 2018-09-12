@@ -60,7 +60,6 @@ Building.stringify = function (building) {
     return JSON.stringify(newBuilding);
 }
 
-
 if (typeof window === "undefined") {
     module.exports = Building;
 }

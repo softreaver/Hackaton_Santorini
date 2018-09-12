@@ -37,6 +37,10 @@ function Player(id) {
         tokensList = newToken;
     }
 
+    this.findTokenById = function (tokenId) {
+        return tokensList.find(token => tokenId === token.getID());
+    }
+
 
     // Methode 
     this.addToken = function (token) {

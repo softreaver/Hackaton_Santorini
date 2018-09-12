@@ -27,8 +27,8 @@ window.onload = () => GameControler.initGame();
         let squaresList = [];
 
         //Création des cases de la grille
-        for(let x = 1; x < 7; x++) {
-            for(let y = 1; y < 7; y++) {
+        for(let x = 1; x < 6; x++) {
+            for(let y = 1; y < 6; y++) {
                 let newSquare = new Square();
                 newSquare.setX(x);
                 newSquare.setY(y);
@@ -38,6 +38,8 @@ window.onload = () => GameControler.initGame();
 
         // Création du plateau de jeu
         privates.board = new Board(squaresList, PlayersList);
+
+        privates.board.setActivePlayer(PlayersList[0]);
 
         privates.board.sendInitGame();
 
@@ -75,16 +77,16 @@ window.onload = () => GameControler.initGame();
     // On écoute les evennements de l'IHM
 
 
-    publics.sendMove = function(token, square) {
-        privates.board.sendMove(token, square);
+    publics.sendMove = function(tokenId, squareId) {
+        privates.board.sendMove(tokenId, squareId);
     }
 
-    publics.sendBuild = function(token, square) {
-        privates.board.sendBuild(token, square);
+    publics.sendBuild = function(tokenId, squareId) {
+        privates.board.sendBuild(tokenId, squareId);
     }
 
-    publics.positionToken = function(token, square) {
-
+    publics.positionToken = function(tokenId, squareId) {
+        privates.board.positionToken(tokenId, squareId);
     }
 
 }(GameControler));

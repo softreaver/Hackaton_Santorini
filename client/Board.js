@@ -34,6 +34,31 @@ function Board(initSquaresList, initPlayersList) {
         SocketIoUtils.sendInitGame(this);
     }
 
+    this.findPlayerById = function( playerId ) {
+        let ret = null;
+
+        playersList.forEach(player => {
+            if(player.getID() === playerId)
+                ret = player;
+        });
+
+        return ret;
+    }
+
+    this.findSquareBycoord = function( squareId ) {
+        let ret = null;
+
+        squaresList.forEach(square => {
+            if(
+                (square.getX() === Number.parseInt(squareId.substr(0,1))) &&
+                (square.getY() === Number.parseInt(squareId.substr(2)))
+            )
+                ret = square;
+        });
+
+        return ret;
+    }
+
 
     /**
      * GETTER / SETTER
