@@ -34,3 +34,6 @@ function Square() {
     }
 
 }
+if (typeof window === "undefined") {
+    module.exports = Square;
+}

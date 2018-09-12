@@ -4,7 +4,7 @@ function Token(id) {
 
     let player = null;
     let square = null;
-    const IMAGE_URL
+    const IMAGE_URL = "";
     const ID = id;
 
     // Getter
@@ -44,4 +44,8 @@ function Token(id) {
 
         square.setToken(this);
     }
+}
+
+if (typeof window === "undefined") {
+    module.exports = Token;
 }

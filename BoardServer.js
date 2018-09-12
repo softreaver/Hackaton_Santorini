@@ -1,5 +1,10 @@
 "use strict";
 
+var Building = require('./model/Building');
+var Player = require('./model/Player');
+var Square = require('./model/Square');
+var Token = require('./model/Token');
+
 function moveException(message) {
     this.message = message;
 }
@@ -9,6 +14,8 @@ function BoardServer() {
     let activePlayer = null;
     let playersList = [];
     let squaresList = [];
+
+
 
     // Méthodes : 
 
@@ -192,5 +199,5 @@ function BoardServer() {
 
 }
 
-
+module.exports = BoardServer;
 

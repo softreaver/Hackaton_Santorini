@@ -6,6 +6,13 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
+
+var Building = require('./model/Building');
+var Player = require('./model/Player');
+var Square = require('./model/Square');
+var Token = require('./model/Token');
+var BoardServer = require('./BoardServer');
+
 var boardServer = new BoardServer();
 
 // On va écouter sur le port 80
@@ -84,6 +91,10 @@ io.on('connection', function (socket) {
         console.log(`Ask for building`);
         // En attente du BoardServer
     });
+    // Evènement pour l'initialisation du jeu
+    socket.on('initGame', function (boardJson) {
+        console.log(`Begin game `);
+    })
 });
 
 console.log('Server online ...');

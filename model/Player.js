@@ -53,3 +53,7 @@ function Player(id) {
         }
     }
 }
+
+if (typeof window === "undefined") {
+    module.exports = Player;
+}

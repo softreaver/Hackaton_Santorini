@@ -33,4 +33,15 @@ function Building() {
         level++;
     }
 
+
+    // Parse un objet 
+    this.parseBuildingWithMethod = function () {
+
+    }
+
+}
+
+
+if (typeof window === "undefined") {
+    module.exports = Building;
 }
