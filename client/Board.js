@@ -72,4 +72,39 @@ function Board(initSquaresList, initPlayersList) {
     this.removePlayer = function (player) {
 
     }
+
+    $("canvas").on('mouseleave', function () { Player });
+
+    server.on('close', function () {
+        // Faire quelque chose quand le serveur est arrêté
+    })
+
+    let http = require('http');
+
+    let server = http.createServer(function (req, res) {
+        res.writeHead(200);
+        res.end('Hello Everybody !');
+    });
+
+    server.on('close', function () { // On écoute l'évènement close
+        console.log('Bye bye !');
+    })
+
+    server.listen(8080); // Démarre le serveur
+
+    server.close(); // Arrête le serveur. Déclenche l'événement close
+
+
+
+
+
+
+    let EventEmitter = require('events').EventEmitter;
+    let game = new EventEmitter();
+    game.on('gameover', function (message) {
+        console.log(message);
+    });
+
+    game.emit('gameover', 'Vous avez perdu !');
+
 }
