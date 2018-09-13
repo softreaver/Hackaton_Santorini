@@ -21,8 +21,10 @@ window.onload = () => GameControler.initGame();
         // Ajout de deux pions par joueur
         PlayersList[0].addToken(new Token(1));
         PlayersList[0].addToken(new Token(2));
+        PlayersList[0].setPseudo('tata');
         PlayersList[1].addToken(new Token(3));
         PlayersList[1].addToken(new Token(4));
+        PlayersList[1].setPseudo('titi');
 
         let squaresList = [];
 
@@ -86,7 +88,7 @@ window.onload = () => GameControler.initGame();
     }
 
     publics.positionToken = function(tokenId, squareId) {
-        privates.board.positionToken(tokenId, squareId);
+        privates.board.sendPositionToken(tokenId, squareId);
     }
 
 }(GameControler));

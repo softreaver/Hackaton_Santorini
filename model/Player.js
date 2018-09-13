@@ -1,5 +1,9 @@
 "use strict";
 
+if (typeof window === "undefined") {
+    var Token = require("./Token");
+}
+
 function Player(id) {
 
     let pseudo;
@@ -15,13 +19,8 @@ function Player(id) {
         return tokensList;
     }
 
-    this.getToken = function (token) {
-        let ret = null;
-        tokensList.forEach(value => {
-            if (BoardServer.checkIfEquals(value, token))
-                ret = value;
-        });
-        return ret;
+    this.getTokenById = function (tokenId) {
+        return tokensList.find(token => token.getID() === tokenId) || null;
     }
 
     this.getID = function () {
@@ -38,14 +37,14 @@ function Player(id) {
     }
 
     this.findTokenById = function (tokenId) {
-        return tokensList.find(token => tokenId === token.getID());
+        return tokensList.find(token => tokenId == token.getID()) || null;
     }
 
 
     // Methode 
     this.addToken = function (token) {
         tokensList.push(token);
-        token.setPlayer(this);
+        token.setPlayerID(ID);
     }
 
     this.removeToken = function (token) {
@@ -61,7 +60,7 @@ function Player(id) {
 // Parse un objet 
 Player.parse = function (player) {
     let newPlayer = new Player(player.ID);
-    newPlayer.setPseudo(building.level);
+    newPlayer.setPseudo(player.pseudo);
     for(let token of player.tokensList){
         newPlayer.addToken(Token.parse(token));
     }

@@ -2,19 +2,19 @@
 
 function Token(id) {
 
-    let player = null;
-    let square = null;
+    let playerID = null;
+    let squareID = null;
     let imageUrl = "";
     const ID = id;
 
     // Getter
 
-    this.getPlayer = function () {
-        return player;
+    this.getPlayerID = function () {
+        return playerID;
     }
 
-    this.getSquare = function () {
-        return square;
+    this.getSquareID = function () {
+        return squareID;
     }
 
     this.getImageUrl = function () {
@@ -27,56 +27,25 @@ function Token(id) {
 
     // Setter
 
-    this.setPlayer = function (newPlayer) {
-        player = newPlayer;
+    this.setPlayerID = function (newPlayerID) {
+        playerID = newPlayerID;
     }
 
-    this.setSquare = function (newSquare) {
-        square = newSquare;
+    this.setSquareID = function (newSquareID) {
+        squareID = newSquareID;
     }
 
     this.setImageUrl = function(newUrl) {
         imageUrl = newUrl;
     }
 
-    // Methode 
-    this.move = function (newSquare) {
-        if (square !== null)
-            square.setToken(null);
-
-        square = newSquare;
-
-        square.setToken(this);
-    }
-
-    // Parse un objet 
-    this.parse = function (token) {
-        let newToken = new Token(token.ID);
-        newToken.setPlayer(token.player);
-        newToken.setSquare(token.square);
-        newToken.setImageUrl(token.imageUrl);
-
-        return newToken;
-    }
-
-    // Serialiser un objet en JSON
-    this.stringify = function (token) {
-        let newToken = {
-            ID: token.getID(),
-            player: token.getPlayer(),
-            square: token.getSquare(),
-            imageUrl: token.getImageUrl(),
-        }
-
-        return JSON.stringify(newsquare);
-    }
 }
 
 // Parse un objet 
 Token.parse = function (token) {
     let newToken = new Token(token.ID);
-    newToken.setPlayer(token.player);
-    newToken.setSquare(token.square);
+    newToken.setPlayerID(token.playerID);
+    newToken.setSquareID(token.squareID);
     newToken.setImageUrl(token.imageUrl);
 
     return newToken;
@@ -86,8 +55,8 @@ Token.parse = function (token) {
 Token.stringify = function (token) {
     let newToken = {
         ID: token.getID(),
-        player: token.getPlayer(),
-        square: token.getSquare(),
+        playerID: token.getPlayerID(),
+        squareID: token.getSquareID(),
         imageUrl: token.getImageUrl(),
     }
 

@@ -1,5 +1,9 @@
 "use strict";
 
+function SocketIoUtilsException(message) {
+    this.message = message;
+}
+
 var SocketIoUtils = SocketIoUtils || {};
 
 (function (publics) {
@@ -34,20 +38,39 @@ var SocketIoUtils = SocketIoUtils || {};
 
     // envoi une demande de mouvement au serveur
     publics.sendMoveToken = function (token, square) {
-        let tokenJson = JSON.stringify(token);
-        let squareJson = JSON.stringify(square);
+        let tokenJson = Token.stringify(token);
+        let squareJson = Square.stringify(square);
 
-        privates.socket.emit('moveToken', tokenJson, squareJson, (type, message) => {
-            console.log(type + ': ' + message);
+        privates.socket.emit('moveToken', tokenJson, squareJson, (type, data) => {
+            console.log(type + ': ' + data);
         });
     };
 
     // envoi d'une demande de construction au serveur
     publics.sendBuild = function (token, square) {
-        let tokenJson = JSON.stringify(token);
-        let squareJson = JSON.stringify(square);
+        let tokenJson = Token.stringify(token);
+        let squareJson = Square.stringify(square);
 
-        privates.socket.emit('build', tokenJson, squareJson);
+        privates.socket.emit('build', tokenJson, squareJson, (type, data) => {
+            if(type === 'ok') {
+
+            } else {
+                throw new SocketIoUtilsException(data);
+            }
+        });
+    }
+
+    publics.sendPositionToken = function(token, square) {
+        let tokenJson = Token.stringify(token);
+        let squareJson = Square.stringify(square);
+
+        privates.socket.emit('positionToken', tokenJson, squareJson, (type, data) => {
+            if(type === 'ok') {
+
+            } else {
+                throw new SocketIoUtilsException(data);
+            }
+        });
     }
 
     // Démarre une partie sur le serveur

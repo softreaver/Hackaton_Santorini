@@ -15,12 +15,16 @@ function Square() {
         return y;
     }
 
-    this.getToken = function (token) {
+    this.getToken = function () {
         return token;
     }
 
     this.getBuilding = function() {
         return building;
+    }
+
+    this.getID = function() {
+        return x + '-' + y;
     }
 
     // Setter
@@ -45,30 +49,6 @@ function Square() {
     this.build = function () {
         building.build();
     }
-
-    // Parse un objet 
-    this.parse = function (square) {
-        let newSquare = new Square();
-        newSquare.setX(square.x);
-        newSquare.setY(square.y);
-        newSquare.setToken(square.token);        
-        newSquare.setBuilding(square.building);
-
-        return newSquare;
-    }
-
-    // Serialiser un objet en JSON
-    this.stringify = function (square) {
-        let newsquare = {
-            x: square.getX(),
-            y: square.getY(),
-            token: square.getToken(),
-            building: square.getBuilding()
-        }
-
-        return JSON.stringify(newsquare);
-    }
-
 }
 
 // Parse un objet 

@@ -3,93 +3,191 @@
 var Building = require('./model/Building');
 var Player = require('./model/Player');
 var Square = require('./model/Square');
-var Token = require('./model/Token');
 
-function moveException(message) {
+function BoardServerException(message, messageIhm) {
     this.message = message;
+    this.messageIhm = messageIhm;
 }
 
 
-function BoardServer() {
+function BoardServer(initSquaresList, initPlayersList) {
     let activePlayer = null;
-    let playersList = [];
-    let squaresList = [];
-
+    let playersList = initPlayersList;
+    let squaresList = initSquaresList;
 
 
     // Méthodes : 
-
-    this.checkIfEquals = function (object1, object2) {
-        for (let key in object1) {
-            if (object1[key] !== object2[key]) {
-                return false;
-            }
-        }
-
-        return true;
+    this.setActivePlayer = function(player) {
+        activePlayer = player;
+        console.log(activePlayer);
     }
 
-    this.getSquare = function (square) {
-        let ret = null;
-        squaresList.forEach(value => {
-            if (BoardServer.checkIfEquals(value, square))
-                ret = value;
-        });
-        return ret;
+    this.getSquare = function (parsedSquare) {
+        return squaresList.find(square => {
+            return (
+                (square.getX() === parsedSquare.x) &&
+                (square.getY() === parsedSquare.y)
+            )
+        }) || null;
+    }
+
+    this.getSquareById = function(squareId) {
+        return squaresList.find(square => square.getID() === squareId) || null;
     }
 
     this.moveToken = function (parsedToken, parsedSquare) {
         // Vérifier qu'il y a un joueur courant
         if (activePlayer === null)
-            throw new moveException("ActivePlayer is null");
+            throw new BoardServerException("ActivePlayer is null");
 
         // Récupérer le token du joueur courant
-        let token = activePlayer.getToken(parsedToken);
+        let token = activePlayer.getTokenById(parsedToken.ID);
 
         // Récupérer le square du plateau
-        let square = getSquare(parsedSquare);
+        let square = this.getSquare(parsedSquare);
 
         // Condition si le token n'est pas null
         if (token !== null) {
             if (square !== null) {
-                if (checkMove) {
-                    token.move(square);
+                // Véfifier que le pion soit positionné sur le plateau
+                if(this.getSquareById(token.getSquareID()) !== null) {
+                    // Vérifier que la case ne contient pas déjà un pion
+                    if(square.getToken() === null) {
+                        // Vérifier que le déplacement respecte les règles du jeu
+                        let oldSquare = this.getSquareById(token.getSquareID());
+                        if (checkMove(oldSquare, square)) { 
+                            oldSquare.setToken(null);               
+                            square.setToken(token);
+                            token.setSquareID(square.getID());
+                        } else {
+                            throw new BoardServerException('The deplacement isn\'t correct', "Le déplacement n'est pas autorisé.");
+                        }
+                    } else {
+                        throw new BoardServerException('The selected square has already a token', "Un pion est déjà présent sur la case selectionnée.");
+                    }
                 } else {
-                    throw new moveException('The deplacement isn\'t correct ');
+                    throw new BoardServerException('The token has no square', "Le pion doit être positionné sur le plateau.");
+                }
+            } else {
+                throw new BoardServerException("Square is null", "La case n'existe pas.");
+            }
+        } else {
+            throw new BoardServerException("Token is null", "Le pion n'existe pas.");
+        }
+    }
+
+    this.build = function (parsedToken, parsedSquare) {
+        // Vérifier qu'il y a un joueur courant
+        if (activePlayer === null)
+            throw new BoardServerException("ActivePlayer is null");
+
+        // Récupérer le token du joueur courant
+        let token = activePlayer.getTokenById(parsedToken.ID);
+
+        // Récupérer le square du plateau
+        let square = this.getSquare(parsedSquare);
+
+        // Condition si le token n'est pas null
+        if (token !== null) {
+            if (square !== null) {
+                // Vérifier que la case ne contient pas déjà un pion
+                if(square.getToken() === null) {
+                    // Vérifier que le pion soit bien placé sur le plateau
+                    if(this.getSquareById(token.getSquareID()) !== null) {
+
+                        // Vérifier que le joueur soit adjacent à la case 
+                        let xDiff = this.getSquareById(token.getSquareID()).getX() - square.getX();
+                        let yDiff = this.getSquareById(token.getSquareID()).getY() - square.getY();
+                        if (
+                            (xDiff >= -1 && xDiff <= 1) &&
+                            (yDiff >= -1 && yDiff <= 1)
+                        ) {
+                            // Vérifier s'il existe un bâtiment sur la case
+                            if (square.getBuilding() === null) {
+                                square.setBuilding(new Building());
+                            } else {
+                                // Vérifier que l'emplacement n'est pas a la hauteur maximal ( dome ) 
+                                if (square.getBuilding().getLevel() < 4) {
+                                    square.build();
+                                } else {
+                                    throw new BoardServerException('Building is at max level', "Le bâtiment ne peux plus être amélioré.");
+                                }
+                            }
+                            console.log(square.getBuilding().getLevel());
+                        } else {
+                            throw new BoardServerException('Square is not adjacent', "Le pion n'est pas adjacent à la case pour construire.");
+                        }
+                    } else {
+                        throw new BoardServerException('The token has no square', "Le pion doit être positionné sur le plateau.");
+                    }
+                } else {
+                    throw new BoardServerException("A token is already present in the square", "Placement impossible, un pion est déjà présent sur la case.");
+                }
+            } else {
+                throw new BoardServerException("Square is null", "La case n'existe pas.");
+            }
+        } else {
+            throw new BoardServerException("Token is null", "Le pion n'existe pas.");
+        }
+    }
+
+    this.positionToken = function(parsedToken, parsedSquare) {
+        // Vérifier qu'il y a un joueur courant
+        if (activePlayer === null)
+            throw new BoardServerException("ActivePlayer is null");
+
+        // Récupérer le token du joueur courant
+        let token = activePlayer.getTokenById(parsedToken.ID);
+
+        // Récupérer le square du plateau
+        let square = this.getSquare(parsedSquare);
+
+        // Condition si le token n'est pas null
+        if (token !== null) {
+            if (square !== null) {
+                // Vérifier que la case ne contient pas déjà un pion
+                if(square.getToken() === null) {
+                    // Vérifier que le pion ne soit pas déjà positionné sur le plateau
+                    if(token.getSquareID() === null) {
+                        square.setToken(token);
+                        token.setSquareID(square.getID());
+                    } else {
+                        throw new BoardServerException("The token is already on the board", "Placement impossible, le pion a déjà été placé sur le plateau.");
+                    }
+                } else {
+                    throw new BoardServerException("A token is already present in the square", "Placement impossible, un pion est déjà présent sur la case.");
                 }
             }
             else {
-                console.log(`There is a problem with the square`);
-                throw new moveException("Square is null ");
+                throw new BoardServerException("Square is null", "La case n'existe pas.");
             }
         } else {
-            console.log(`There is a problem with the token`);
-            throw new moveException("Token is null");
+            throw new BoardServerException("Token is null", "Le pion n'existe pas.");
         }
     }
 
 
-    let checkMove = function (token, square) {
-        if (BoardServer.checkIfEquals(square, element)) {
+    let checkMove = function (oldSquare, square) {
+        if (oldSquare !== null) {
             // Verifier que le pion soit adjacent a la case
-            let xDiff = token.getSquare().getX() - square.getX();
-            let yDiff = token.getSquare().getY() - square.getY();
+            let xDiff = oldSquare.getX() - square.getX();
+            let yDiff = oldSquare.getY() - square.getY();
             if (
                 (xDiff >= -1 && xDiff <= 1) &&
                 (yDiff >= -1 && yDiff <= 1)
             ) {
                 // Verifier que le niveau de la case de destination soit inférieur ou ne soit pas suppérieur a plus de 1
                 let tokenLevel;
-                if (token.getSquare().getBuilding() === null)
+                if (oldSquare.getBuilding() === null)
                     tokenLevel = 0;
                 else
-                    tokenLevel = token.getSquare().getBuilding().getLevel();
+                    tokenLevel = oldSquare.getBuilding().getLevel();
 
                 let squareLevel;
-                if (square.getSquare().getBuilding() === null)
+                if (square.getBuilding() === null)
                     squareLevel = 0;
                 else
-                    squareLevel = square.getSquare().getBuilding().getLevel();
+                    squareLevel = square.getBuilding().getLevel();
 
                 if (
                     (squareLevel < tokenLevel) ||
@@ -102,84 +200,49 @@ function BoardServer() {
         return false;
     }
 
-
-    this.build = function (parsedToken, parseSquare) {
-        // Vérifier qu'il y a un joueur courant
-        if (activePlayer === null)
-            throw new moveException("ActivePlayer is null");
-
-        // Récupérer le token du joueur courant
-        let token = activePlayer.getToken(parsedToken);
-
-        // Récupérer le square du plateau
-        let square = getSquare(parsedSquare);
-
-        // Vérifier s'il existe un bâtiment sur la case
-        if (square.getBuilding() === null) {
-            square.setBuilding(new Building());
-        } else {
-            // Vérifier que l'emplacement n'est pas a la hauteur maximal ( dome ) 
-            if (square.getBuilding().getLevel() < 4) {
-
-                // Vérifier que le joueur soit adjacent à la case 
-                let xDiff = token.getSquare().getX() - square.getX();
-                let yDiff = token.getSquare().getY() - square.getY();
-                if (
-                    (xDiff >= -1 && xDiff <= 1) &&
-                    (yDiff >= -1 && yDiff <= 1)
-                ) {
-                    square.build();
-                }
-            }
-        }
-    }
-
-
     this.checkVictory = function () {
 
-        // Vérifier si le joueur courant rencontre les conditions de victoire 
-        activePlayer.getTokensList().forEach(token => {
+        let oldSquare = this.getSquareById(token.getSquareID());
+        if (oldSquare !== null) {
+            // Vérifier si le joueur courant rencontre les conditions de victoire 
+            activePlayer.getTokensList().forEach(token => {
 
-            if (token.getSquare().getBuilding().getLevel() == 3) {
-                return true;
-            }
-            else if (findOtherPlayer() != null) {
-                let canMove = false;
-                findOtherPlayer().getTokensList().forEach(tokenOtherPlayer => {
-                    let adjacentSquaresList = getAdjacentSquares(tokenOtherPlayer.getSquare());
+                if (token.getSquare().getBuilding().getLevel() == 3) {
+                    return true;
+                }
+                else if (findOtherPlayer() != null) {
+                    let canMove = false;
+                    findOtherPlayer().getTokensList().forEach(tokenOtherPlayer => {
+                        let adjacentSquaresList = getAdjacentSquares(tokenOtherPlayer.getSquare());
 
-                    adjacentSquaresList.forEach(square => {
-                        if (square.getToken() === null) {
-                            canMove = true;
-                        } else if (square.getBuilding() !== null) {
-                            let tokenLevel;
-                            if (tokenOtherPlayer.getSquare().getBuilding() === null)
-                                tokenLevel = 0;
-                            else
-                                tokenLevel = tokenOtherPlayer.getSquare().getBuilding().getLevel();
-                            if (square.getBuilding().getLevel() <= tokenLevel + 1) {
+                        adjacentSquaresList.forEach(square => {
+                            if (square.getToken() === null) {
+                                canMove = true;
+                            } else if (square.getBuilding() !== null) {
+                                let tokenLevel;
+                                if (tokenOtherPlayer.getSquare().getBuilding() === null)
+                                    tokenLevel = 0;
+                                else
+                                    tokenLevel = tokenOtherPlayer.getSquare().getBuilding().getLevel();
+                                if (square.getBuilding().getLevel() <= tokenLevel + 1) {
+                                    canMove = true;
+                                }
+                            } else {
                                 canMove = true;
                             }
-                        } else {
-                            canMove = true;
-                        }
+                        });
                     });
-                });
 
-                return !canMove;
+                    return !canMove;
 
-            } else {
-                return false;
-            }
-        });
+                }
+            });
+        } 
+        return false
     }
 
     let findOtherPlayer = function () {
-        playersList.forEach(player => {
-            if (activePlayer != player)
-                return player;
-        });
-        return null;
+        return playersList.find(player => player !== activePlayer) || null;
     };
 
     let getAdjacentSquares = function (square) {
@@ -196,7 +259,63 @@ function BoardServer() {
         return adjacentSquaresList;
     };
 
+}
 
+// Parse un objet 
+BoardServer.parse = function (board) {
+    let squaresList = [];
+    let squaresObjList = board.squaresList;
+
+    let playersList = [];
+    let playersObjList = board.playersList;
+
+    for(let squareJson of squaresObjList) {
+        squaresList.push(Square.parse(squareJson));
+    }
+
+    for(let playerJson of playersObjList) {
+        playersList.push(Player.parse(playerJson));
+    }
+
+    let newBoard = new BoardServer(squaresList, playersList);
+    newBoard.setActivePlayer(Player.parse(board.activePlayer));
+
+    return newBoard;
+}
+
+// Serialiser un objet en JSON
+BoardServer.stringify = function (board) {
+    let squaresObjList = [];
+    let squares = board.getSquaresList();
+
+    let playersObjList = [];
+    let players = board.getPlayersList();
+
+    for(let square of squares) {
+        squaresObjList.push(JSON.parse(Square.stringify(square)));
+    }
+
+    for(let player of players) {
+        playersObjList.push(JSON.parse(Player.stringify(player)));
+    }
+
+    let newBoard = {
+        activePlayer: board.getActivePlayer(),
+        playersList: playersObjList,
+        squaresList: squaresObjList
+    }
+
+    return JSON.stringify(newBoard);
+}
+
+BoardServer.checkIfEquals = function (object1, object2) {
+    for (let key in object1) {
+        if (object1[key] !== object2[key]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 module.exports = BoardServer;

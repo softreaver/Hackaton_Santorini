@@ -7,10 +7,6 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
 
-var Building = require('./model/Building');
-var Player = require('./model/Player');
-var Square = require('./model/Square');
-var Token = require('./model/Token');
 var BoardServer = require('./BoardServer');
 
 var boardServer = new BoardServer();
@@ -78,28 +74,60 @@ io.on('connection', function (socket) {
 
     // Evenement pour la méthode moveToken
     socket.on('moveToken', function (tokenJson, squareJson, ret) {
-        console.log(`MoveToken => token = ` + tokenJson + ' square = ' + squareJson);
+        console.log(`[Move token] => token = ` + tokenJson + ' square = ' + squareJson);
 
-        let token = JSON.parse(tokenJson);
-        let square = JSON.parse(squareJson);
+        let parsedToken = JSON.parse(tokenJson);
+        let parsedSquare = JSON.parse(squareJson);
 
         try {
-            boardServer.moveToken(token, square);
+            boardServer.moveToken(parsedToken, parsedSquare);
             socket.broadcast.emit('moveToken', tokenJson, squareJson);
-            ret('ok');
+            console.log('[OK]');
+            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
         } catch (error) {
-            console.error('error : ' + error.message);
-            ret('error', "Le déplacement est interdit");
+            console.error('[ERROR] => ' + error.message);
+            ret('error', error.messageIhm);
+        }
+    });
+    // Positionnementd'un pion
+    socket.on('positionToken', (tokenJson, squareJson, ret) => {
+        console.log("[Position token] => token = " + tokenJson + " square = " + squareJson);
+
+        let parsedToken = JSON.parse(tokenJson);
+        let parsedSquare = JSON.parse(squareJson);
+
+        try {
+            boardServer.positionToken(parsedToken, parsedSquare);
+            socket.broadcast.emit('positionToken', tokenJson, squareJson);
+            console.log('[OK]');
+            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
+        } catch (error) {
+            console.error('[ERROR] => ' + error.message);
+            ret('error', error.messageIhm);
         }
     });
     // Evenement pour la méthode build
-    socket.on('build', function (TokenJson, squareJson) {
-        console.log(`Ask for building`);
-        // En attente du BoardServer
+    socket.on('build', function (tokenJson, squareJson, ret) {
+        console.log("[Build] => token = " + tokenJson + " square = " + squareJson);
+
+        let parsedToken = JSON.parse(tokenJson);
+        let parsedSquare = JSON.parse(squareJson);
+
+        try {
+            boardServer.build(parsedToken, parsedSquare);
+            socket.broadcast.emit('positionToken', tokenJson, squareJson);
+            console.log('[OK]');
+            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
+        } catch (error) {
+            console.error('[ERROR] => ' + error.message);
+            ret('error', error.messageIhm);
+        }
     });
     // Evènement pour l'initialisation du jeu
     socket.on('initGame', function (boardJson) {
         console.log(`[Init game] => board = ` + boardJson);
+
+        boardServer = BoardServer.parse(JSON.parse(boardJson));
     })
 });
 

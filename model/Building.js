@@ -3,7 +3,7 @@
 function Building() {
 
     let level = 1;
-    let square = null;
+    let squareID = null;
     let imageUrl = "../img/buildingLvl";
 
     // Getter
@@ -11,8 +11,8 @@ function Building() {
         return level;
     }
 
-    this.getSquare = function () {
-        return square;
+    this.getSquareID = function () {
+        return squareID;
     }
 
     this.getImageUrl = function () {
@@ -24,8 +24,8 @@ function Building() {
         level = newLevel;
     }
 
-    this.setSquare = function (newSquare) {
-        square = newSquare;
+    this.setSquareID = function (newSquareID) {
+        squareID = newSquareID;
     }
 
     this.setImageUrl = function(newUrl) {
@@ -43,7 +43,7 @@ function Building() {
 Building.parse = function (building) {
     let newBuilding = new Building();
     newBuilding.setLevel(building.level);
-    newBuilding.setSquare(Square.parse(building.square));
+    newBuilding.setSquareID(building.squareID);
     newBuilding.setImageUrl(building.imageUrl);
 
     return newBuilding;
@@ -53,7 +53,7 @@ Building.parse = function (building) {
 Building.stringify = function (building) {
     let newBuilding = {
         level: building.getLevel(),
-        square: building.getSquare(),
+        squareID: building.getSquare().getX() + '-' + building.getSquare().getY(),
         imageUrl: building.getImageUrl()
     }
 

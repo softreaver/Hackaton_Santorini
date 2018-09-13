@@ -1,29 +1,65 @@
 "use strict";
 
+function BoardException(message) {
+    this.message = message;
+}
+
 function Board(initSquaresList, initPlayersList) {
     let activePlayer = null;
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
 
-    this.sendMove = function (token, square) {
-        SocketIoUtils.sendMoveToken(token, square);
+    this.sendMove = function (tokenId, squareId) {
+        let token = activePlayer.findTokenById(tokenId);
+        let square = this.findSquareBycoord(squareId);
+
+        if(token !== null && square !== null) {
+            try {
+                SocketIoUtils.sendMoveToken(token, square);
+            } catch (error) {
+                console.log(error.message);
+            }
+        } else {
+            throw new BoardException("The token or the square given on parameter was not found!");
+        }
     }
 
     this.getMove = function (token, square) {
-        this.tokenJson;
-        this.squareJson;
+
     }
 
-    this.sendBuild = function (token, square) {
+    this.sendBuild = function (tokenId, squareId) {
+        let token = activePlayer.findTokenById(tokenId);
+        let square = this.findSquareBycoord(squareId);
 
+        if(token !== null && square !== null) {
+            try {
+                SocketIoUtils.sendBuild(token, square);
+            } catch (error) {
+                console.log(error.message);
+            }
+        } else {
+            throw new BoardException("The token or the square given on parameter was not found!");
+        }
      }
 
     this.getBuild = function (token, square) {
-        this.squareJson;
+
     }
 
-    this.sendPositionToken = function (token, square) {
+    this.sendPositionToken = function(tokenId, squareId) {
+        let token = activePlayer.findTokenById(tokenId);
+        let square = this.findSquareBycoord(squareId);
 
+        if(token !== null && square !== null) {
+            try {
+                SocketIoUtils.sendPositionToken(token, square);
+            } catch (error) {
+                console.log(error.message);
+            }
+        } else {
+            throw new BoardException("The token or the square given on parameter was not found!");
+        }
     }
 
     this.getPositionToken = function (token, square) {
@@ -58,7 +94,6 @@ function Board(initSquaresList, initPlayersList) {
 
         return ret;
     }
-
 
     /**
      * GETTER / SETTER
@@ -137,7 +172,7 @@ Board.stringify = function (board) {
     }
 
     let newBoard = {
-        activePlayer: board.getActivePlayer(),
+        activePlayer: JSON.parse(Player.stringify(board.getActivePlayer())),
         playersList: playersObjList,
         squaresList: squaresObjList
     }
