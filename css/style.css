@@ -2,6 +2,18 @@
     box-sizing: border-box;
 }
 
+body {
+    overflow: hidden;
+    margin: -10px;
+    padding: -10px;
+}
+
+.container{
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
 .plateforme{
     display: flex;
     flex-wrap: wrap;
@@ -118,6 +130,8 @@ buildingLvl3WithPion1{
 /* PION 2 */
 
 
+
+
 buildingLvl1WithPion2{
     background-image: url("../img/buildingLvl1WithPion2.png");
     height: 300px;
@@ -130,5 +144,38 @@ buildingLvl2WithPion2{
 }
 buildingLvl3WithPion2{
     background-image: url("../img/buildingLvl3WithPion2.png");
-
 }
+
+
+/*log */
+.log{
+    background-color: gray;
+    height: 1000px;
+    width: 40%;
+}
+
+/* FORMULAIRE */
+
+.formulaire{
+    height: 400px;
+    width: 400px;
+    margin-left: 40%;
+    padding-top: 20%;
+}
+
+
+.background{
+    background-image: url("../img/minimalist.jpg");
+    height: 1076px;
+    margin-top: -100px;
+    background-repeat: no-repeat;
+    background-position: top;
+}
+
+h1{
+    text-align: center;
+    margin-top: 500px;
+    font-family: Impact, fantasy;
+    font-style: italic;
+}
+
