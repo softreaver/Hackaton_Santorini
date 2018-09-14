@@ -4,6 +4,14 @@
 
 body {
     overflow: hidden;
+    margin: -10px;
+    padding: -10px;
+}
+
+.container{
+    display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 .plateforme{
@@ -139,6 +147,12 @@ buildingLvl3WithPion2{
 }
 
 
+/*log */
+.log{
+    background-color: gray;
+    height: 1000px;
+    width: 40%;
+}
 
 /* FORMULAIRE */
 
@@ -163,8 +177,5 @@ h1{
     margin-top: 500px;
     font-family: Impact, fantasy;
     font-style: italic;
-
-
-
-
 }
+
