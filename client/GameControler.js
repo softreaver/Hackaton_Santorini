@@ -78,6 +78,35 @@ window.onload = () => GameControler.initGame();
 
     // On écoute les evennements de l'IHM
 
+    // 
+    let squaresListElt = document.querySelectorAll(".squares")
+    squaresListElt.forEach(element => {
+        element.addEventListener('click', function (e){
+            let getIdSquare = e.currentTarget.id ;
+            let childElt = document.querySelector("#" + getIdSquare).firstChild;
+
+            if(childElt !== null) {
+                let hasToken = false;
+                childElt.classList.forEach(className => {
+                    if(className.toLowerCase().indexOf('pion') !== -1)
+                        hasToken = true;
+                });
+
+                if(hasToken) {
+                    squaresListElt.forEach(element =>{
+                        element.removeEventListener('Click');
+
+                        let xDiff = (Number.parseInt(getIdSquare.substr(0,1))) - (Number.parseInt(element.id.substr(0,1)));
+                        let yDiff = (Number.parseInt(getIdSquare.substr(2))) - (Number.parseInt(element.id.substr(2)));
+
+                        if(xDiff >= -1 && xDiff <= 1 && yDiff >=1 && yDiff <= 1) {
+                            privates.board.sendMove(childElt.id, element.id);
+                        }
+                    })
+                }
+            }
+        });
+    });
 
     publics.sendMove = function(tokenId, squareId) {
         privates.board.sendMove(tokenId, squareId);
