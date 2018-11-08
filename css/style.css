@@ -28,7 +28,6 @@ body {
 }
 
 /* SQUARE */
-
 .squares{
     border-radius: 5px;
     background-color: rgba(158, 114, 19, 0.60);
@@ -49,8 +48,6 @@ body {
 
 
 /* BUILDINGS */
-
-
 .buildingLvl1{
     background-image: url("../img/buildingLvl1.png");
     height: 250px;
@@ -86,7 +83,6 @@ body {
 
 
 /* PIONS */
-
 .pion1{
     background-image: url("../img/pion.png");
     height: 280px;
@@ -106,9 +102,7 @@ body {
 }
 
 
-
 /* BUILDINGS WITH PIONS */
-
 .buildindAndPion {
     height: 300px;
     background-repeat: no-repeat;
@@ -120,29 +114,25 @@ body {
     background-image: url("../img/buildingLvl1WithPion1.png");
 }
 
-buildingLvl2WithPion1{
+.buildingLvl2WithPion1{
     background-image: url("../img/buildingLvl2WithPion1.png");
 }
-buildingLvl3WithPion1{
+.buildingLvl3WithPion1{
     background-image: url("../img/buildingLvl3WithPion1.png");
 }
 
 /* PION 2 */
-
-
-
-
-buildingLvl1WithPion2{
+.buildingLvl1WithPion2{
     background-image: url("../img/buildingLvl1WithPion2.png");
     height: 300px;
     background-repeat: no-repeat;
     margin-top: -140px;
     margin-left: -40px;
 }
-buildingLvl2WithPion2{
+.buildingLvl2WithPion2{
     background-image: url("../img/buildingLvl2WithPion2.png");
 }
-buildingLvl3WithPion2{
+.buildingLvl3WithPion2{
     background-image: url("../img/buildingLvl3WithPion2.png");
 }
 

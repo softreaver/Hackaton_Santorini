@@ -28,7 +28,7 @@ var SocketIoUtils = SocketIoUtils || {};
 
     // si le client est déconnecté du serveur
     privates.socket.on('disconnect', () => {
-
+        console.log('déconnecté');
     });
 
     // La conneciton au serveur échoue
@@ -115,5 +115,14 @@ var SocketIoUtils = SocketIoUtils || {};
 
     });
 
+    // Message à afficher 
+    privates.socket.on('message', message => {
+        console.log(message);
+    });
 
+    // Demande du pseudo de la part du serveur
+    privates.socket.on('whoareyou', callBack => {
+        let pseudo = prompt('Ton pseudo : ');
+        callBack(pseudo);
+    });
 }(SocketIoUtils));

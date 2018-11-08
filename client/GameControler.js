@@ -15,17 +15,6 @@ window.onload = () => GameControler.initGame();
 
         //Création de deux joueurs fictifs
         let PlayersList = [];
-        PlayersList.push(new Player(1));
-        PlayersList.push(new Player(2));
-
-        // Ajout de deux pions par joueur
-        PlayersList[0].addToken(new Token(1));
-        PlayersList[0].addToken(new Token(2));
-        PlayersList[0].setPseudo('tata');
-        PlayersList[1].addToken(new Token(3));
-        PlayersList[1].addToken(new Token(4));
-        PlayersList[1].setPseudo('titi');
-
         let squaresList = [];
 
         //Création des cases de la grille
@@ -77,8 +66,6 @@ window.onload = () => GameControler.initGame();
     };
 
     // On écoute les evennements de l'IHM
-
-    // 
     let squaresListElt = document.querySelectorAll(".squares")
     squaresListElt.forEach(element => {
         element.addEventListener('click', function (e){

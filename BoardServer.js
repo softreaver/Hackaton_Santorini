@@ -3,6 +3,7 @@
 var Building = require('./model/Building');
 var Player = require('./model/Player');
 var Square = require('./model/Square');
+var Token = require('./model/Token');
 
 function BoardServerException(message, messageIhm) {
     this.message = message;
@@ -15,11 +16,16 @@ function BoardServer(initSquaresList, initPlayersList) {
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
 
-
     // Méthodes : 
-    this.setActivePlayer = function(player) {
-        activePlayer = player;
-        console.log(activePlayer);
+    this.setActivePlayer = function(player = null) {
+        if(player === null)
+            activePlayer = playersList[0];
+        else
+            activePlayer = player;
+    }
+
+    this.gameFull = function() {
+        return (playersList.length === 2);
     }
 
     this.getSquare = function (parsedSquare) {
@@ -166,38 +172,34 @@ function BoardServer(initSquaresList, initPlayersList) {
         }
     }
 
-
-    let checkMove = function (oldSquare, square) {
-        if (oldSquare !== null) {
-            // Verifier que le pion soit adjacent a la case
-            let xDiff = oldSquare.getX() - square.getX();
-            let yDiff = oldSquare.getY() - square.getY();
-            if (
-                (xDiff >= -1 && xDiff <= 1) &&
-                (yDiff >= -1 && yDiff <= 1)
-            ) {
-                // Verifier que le niveau de la case de destination soit inférieur ou ne soit pas suppérieur a plus de 1
-                let tokenLevel;
-                if (oldSquare.getBuilding() === null)
-                    tokenLevel = 0;
-                else
-                    tokenLevel = oldSquare.getBuilding().getLevel();
-
-                let squareLevel;
-                if (square.getBuilding() === null)
-                    squareLevel = 0;
-                else
-                    squareLevel = square.getBuilding().getLevel();
-
-                if (
-                    (squareLevel < tokenLevel) ||
-                    (squareLevel - tokenLevel <= 1)
-                ) {
-                    return true;
-                }
+    this.addPlayer = function(socketId, pseudo) {
+        try {
+            if(this.findPlayerByPseudo(socketId) === null) {
+                let playerToAdd = new Player(socketId);
+                playerToAdd.setPseudo(pseudo);
+                // Vérifier qu'il y ai une place libre pour rejoindre la partie
+                if (playersList.length < 2) {
+                    playersList.push(playerToAdd);
+                    // Ajout de deux pions par joueur
+                    playersList[playersList.length - 1].addToken(new Token(1));
+                    playersList[playersList.length - 1].addToken(new Token(2));
+                } else
+                    throw new BoardServerException("No space available", "La partie est pleine.");
             }
+        } catch(error) {
+            throw new BoardServerException(error.message, "Impossible de vous ajouter à la partie. " + error.messageIhm);
         }
-        return false;
+    }
+
+    this.findPlayerByPseudo = function (pseudo) {
+        let playerFound = null;
+        playersList.forEach(player => {
+            if (player.getPseudo() === pseudo) {
+                playerFound = player;
+            }
+        });
+
+        return playerFound;
     }
 
     this.checkVictory = function () {
@@ -241,11 +243,44 @@ function BoardServer(initSquaresList, initPlayersList) {
         return false
     }
 
+    let checkMove = function (oldSquare, square) {
+        if (oldSquare !== null) {
+            // Verifier que le pion soit adjacent a la case
+            let xDiff = oldSquare.getX() - square.getX();
+            let yDiff = oldSquare.getY() - square.getY();
+            if (
+                (xDiff >= -1 && xDiff <= 1) &&
+                (yDiff >= -1 && yDiff <= 1)
+            ) {
+                // Verifier que le niveau de la case de destination soit inférieur ou ne soit pas suppérieur a plus de 1
+                let tokenLevel;
+                if (oldSquare.getBuilding() === null)
+                    tokenLevel = 0;
+                else
+                    tokenLevel = oldSquare.getBuilding().getLevel();
+
+                let squareLevel;
+                if (square.getBuilding() === null)
+                    squareLevel = 0;
+                else
+                    squareLevel = square.getBuilding().getLevel();
+
+                if (
+                    (squareLevel < tokenLevel) ||
+                    (squareLevel - tokenLevel <= 1)
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     let findOtherPlayer = function () {
         return playersList.find(player => player !== activePlayer) || null;
     };
 
-    let getAdjacentSquares = function (square) {
+    let getAdjacentSquares = function () {
         let adjacentSquaresList = []
         for (let x = -1; x < 2; x++) {
             for (let y = -1; y < 2; y++) {
@@ -258,7 +293,6 @@ function BoardServer(initSquaresList, initPlayersList) {
 
         return adjacentSquaresList;
     };
-
 }
 
 // Parse un objet 
@@ -278,7 +312,7 @@ BoardServer.parse = function (board) {
     }
 
     let newBoard = new BoardServer(squaresList, playersList);
-    newBoard.setActivePlayer(Player.parse(board.activePlayer));
+    newBoard.setActivePlayer(null);
 
     return newBoard;
 }

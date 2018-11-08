@@ -70,6 +70,9 @@ Player.parse = function (player) {
 
 // Serialiser un objet en JSON
 Player.stringify = function (player) {
+    if(!player)
+        return null;
+
     let tokensObjList = [];
     let tokens = player.getTokensList();
 
