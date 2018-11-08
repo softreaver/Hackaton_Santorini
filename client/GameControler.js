@@ -51,7 +51,7 @@ window.onload = () => GameControler.initGame();
 
     publics.playerConnect = function () {
 
-     };
+    };
 
     publics.playerLeave = function () { 
 
@@ -62,7 +62,7 @@ window.onload = () => GameControler.initGame();
      };
 
     publics.opponentTurn = function () {
-
+        
     };
 
     // On écoute les evennements de l'IHM
@@ -70,7 +70,7 @@ window.onload = () => GameControler.initGame();
     squaresListElt.forEach(element => {
         element.addEventListener('click', function (e){
             let getIdSquare = e.currentTarget.id ;
-            let childElt = document.querySelector("#" + getIdSquare).firstChild;
+            let childElt = document.querySelector(`#${getIdSquare}`).firstChild;
 
             if(childElt !== null) {
                 let hasToken = false;

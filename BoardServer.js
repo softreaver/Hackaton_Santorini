@@ -15,6 +15,9 @@ function BoardServer(initSquaresList, initPlayersList) {
     let activePlayer = null;
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
+    let gameStarted = false;
+
+    let step = 0 // La phase d'un tour de joueur : 0 = positionner les pions | 1 = déplacer un pion | 2 = construire/améliorer un batiment.
 
     // Méthodes : 
     this.setActivePlayer = function(player = null) {
@@ -22,6 +25,28 @@ function BoardServer(initSquaresList, initPlayersList) {
             activePlayer = playersList[0];
         else
             activePlayer = player;
+    }
+
+    this.getStep = function() {
+        return step;
+    }
+
+    this.advanceStep = function() {
+        step++;
+        if (step > 2) step = 1;
+    }
+
+    this.getActivePlayer = function() {
+        return activePlayer;
+    }
+
+    this.hasGameStarted = function() {
+        return gameStarted;
+    }
+
+    this.setGameStarted = function(started) {
+        if(typeof started === 'boolean')
+            gameStarted = started;
     }
 
     this.gameFull = function() {
@@ -212,9 +237,9 @@ function BoardServer(initSquaresList, initPlayersList) {
                 if (token.getSquare().getBuilding().getLevel() == 3) {
                     return true;
                 }
-                else if (findOtherPlayer() != null) {
+                else if (this.findOtherPlayer() != null) {
                     let canMove = false;
-                    findOtherPlayer().getTokensList().forEach(tokenOtherPlayer => {
+                    this.findOtherPlayer().getTokensList().forEach(tokenOtherPlayer => {
                         let adjacentSquaresList = getAdjacentSquares(tokenOtherPlayer.getSquare());
 
                         adjacentSquaresList.forEach(square => {
@@ -241,6 +266,17 @@ function BoardServer(initSquaresList, initPlayersList) {
             });
         } 
         return false
+    }
+
+    this.allTokensArePositionned = function() {
+        let allSet = true;
+        playersList.forEach(player => {
+            player.getTokensList.forEach(token => {
+                if (token.getSquareID() === null)
+                    allSet = false;
+            });
+        });
+        return allSet;
     }
 
     let checkMove = function (oldSquare, square) {
@@ -276,7 +312,7 @@ function BoardServer(initSquaresList, initPlayersList) {
         return false;
     }
 
-    let findOtherPlayer = function () {
+    this.findOtherPlayer = function () {
         return playersList.find(player => player !== activePlayer) || null;
     };
 

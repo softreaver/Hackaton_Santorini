@@ -23,7 +23,7 @@ var boardServer = null;
 app.use(session);
 
 // On va écouter sur le port 80
-server.listen(80);
+server.listen(8080);
 
 // Route, mappage
 // Ajout d'une route a Express ? 
@@ -95,7 +95,7 @@ io.on('connection', function (socket) {
                     socket.handshake.session.save();
                     console.log("SESSION ENREGISTREE ===>> " + socket.handshake.session.userPseudo);
                     if (boardServer)
-                        if(boardServer.gameFull()) 
+                        if(boardServer.gameFull() && !boardServer.hasGameStarted()) 
                             startGame();
                 } catch (error) {
                     console.error('[ERROR] => ' + error.message);
@@ -113,52 +113,80 @@ io.on('connection', function (socket) {
     socket.on('moveToken', function (tokenJson, squareJson, ret) {
         console.log(`[Move token] => token = ` + tokenJson + ' square = ' + squareJson);
 
-        let parsedToken = JSON.parse(tokenJson);
-        let parsedSquare = JSON.parse(squareJson);
+        if(boardServer.getStep() === 1) {
+            let parsedToken = JSON.parse(tokenJson);
+            let parsedSquare = JSON.parse(squareJson);
 
-        try {
-            boardServer.moveToken(parsedToken, parsedSquare);
-            socket.broadcast.emit('moveToken', tokenJson, squareJson);
-            console.log('[OK]');
-            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
-        } catch (error) {
-            console.error('[ERROR] => ' + error.message);
-            ret('error', error.messageIhm);
-        }
+            try {
+                boardServer.moveToken(parsedToken, parsedSquare);
+                socket.broadcast.emit('moveToken', tokenJson, squareJson);
+                console.log('[OK]');
+                ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
+
+                boardServer.advanceStep();
+                sendTurnSignal();
+            } catch (error) {
+                console.error('[ERROR] => ' + error.message);
+                ret('error', error.messageIhm);
+            }
+        } else {
+            console.log('[ERROR] => It is not move step.');
+            sendTurnSignal(socket);
+        }  
     });
     // Positionnementd'un pion
     socket.on('positionToken', (tokenJson, squareJson, ret) => {
         console.log("[Position token] => token = " + tokenJson + " square = " + squareJson);
 
-        let parsedToken = JSON.parse(tokenJson);
-        let parsedSquare = JSON.parse(squareJson);
+        if(boardServer.getStep() === 0) {
+            let parsedToken = JSON.parse(tokenJson);
+            let parsedSquare = JSON.parse(squareJson);
+    
+            try {
+                boardServer.positionToken(parsedToken, parsedSquare);
+                socket.broadcast.emit('positionToken', tokenJson, squareJson);
+                console.log('[OK]');
+                ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
 
-        try {
-            boardServer.positionToken(parsedToken, parsedSquare);
-            socket.broadcast.emit('positionToken', tokenJson, squareJson);
-            console.log('[OK]');
-            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
-        } catch (error) {
-            console.error('[ERROR] => ' + error.message);
-            ret('error', error.messageIhm);
-        }
+                boardServer.setActivePlayer(boardServer.findOtherPlayer());
+                if (boardServer.allTokensArePositionned()) {
+                    boardServer.advanceStep();
+                }
+                sendTurnSignal();
+            } catch (error) {
+                console.error('[ERROR] => ' + error.message);
+                ret('error', error.messageIhm);
+            }
+        } else {
+            console.log('[ERROR] => It is not position step.');
+            sendTurnSignal(socket);
+        }        
     });
     // Evenement pour la méthode build
     socket.on('build', function (tokenJson, squareJson, ret) {
         console.log("[Build] => token = " + tokenJson + " square = " + squareJson);
 
-        let parsedToken = JSON.parse(tokenJson);
-        let parsedSquare = JSON.parse(squareJson);
+        if(boardServer.getStep() === 2) {
+            let parsedToken = JSON.parse(tokenJson);
+            let parsedSquare = JSON.parse(squareJson);
 
-        try {
-            boardServer.build(parsedToken, parsedSquare);
-            socket.broadcast.emit('positionToken', tokenJson, squareJson);
-            console.log('[OK]');
-            ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
-        } catch (error) {
-            console.error('[ERROR] => ' + error.message);
-            ret('error', error.messageIhm);
-        }
+            try {
+                boardServer.build(parsedToken, parsedSquare);
+                socket.broadcast.emit('positionToken', tokenJson, squareJson);
+                console.log('[OK]');
+                ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
+
+                boardServer.setActivePlayer(boardServer.findOtherPlayer());
+                boardServer.advanceStep();
+                sendTurnSignal();
+            } catch (error) {
+                console.error('[ERROR] => ' + error.message);
+                ret('error', error.messageIhm);
+            }
+        } else {
+            console.log('[ERROR] => It is not buid step.');
+            sendTurnSignal(socket);
+        }   
     });
     // Evènement pour l'initialisation du jeu
     socket.on('initGame', function (boardJson) {
@@ -174,7 +202,7 @@ io.on('connection', function (socket) {
                     socket.handshake.session.save();
                     console.log("SESSION ENREGISTREE ===>> " + socket.handshake.session.userPseudo);
                     if (boardServer)
-                        if(boardServer.gameFull())
+                        if(boardServer.gameFull() && !boardServer.hasGameStarted())
                             startGame();
                 } catch (error) {
                     console.error('[ERROR] => ' + error.message);
@@ -191,6 +219,40 @@ console.log('Server online ...');
 
 function startGame() {
     console.log('La partie commence !');
+
+    // Sans paramètre le joueur actif sera le premier de la liste (donc le créateur de la partie)
     boardServer.setActivePlayer();
-    
+    boardServer.setGameStarted(true);
+
+    // Envoyer le signal de tour aux joueurs
+    sendTurnSignal();
+}
+
+function sendTurnSignal(socket = null) {
+    console.log(boardServer.findOtherPlayer().getPseudo());
+    io.sockets.connected[boardServer.getActivePlayer().getID()].emit('yourTurn');
+    io.sockets.connected[boardServer.findOtherPlayer().getID()].emit('OpponentTurn');
+
+    switch(boardServer.getStep()) {
+        case 0:
+            if(socket === null)
+                io.sockets.emit('positionStep');
+            else
+                socket.emit('positionStep');
+            break;
+
+        case 1:
+            if(socket === null)
+                io.sockets.emit('moveStep');
+            else
+                socket.emit('moveStep');
+            break;
+
+        case 2:
+            if(socket === null)
+                io.sockets.emit('buildStep');
+            else
+                socket.emit('buildStep');
+            break;
+    }
 }
