@@ -55,6 +55,15 @@ function Player(id) {
             }
         }
     }
+
+    this.getNextAvailableToken = function () {
+        let ret = null;
+        tokensList.forEach(token => {
+            if (token.getSquareID() === null)
+                ret = token;
+        });
+        return ret;
+    }
 }
 
 // Parse un objet 

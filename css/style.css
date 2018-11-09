@@ -37,6 +37,10 @@ body {
 
 }
 
+.green {
+    background-color: rgba(0, 255, 0, 0.60);
+}
+
 .squares:hover{
   background-color: rgba(26, 45, 192, 0.60);
 }

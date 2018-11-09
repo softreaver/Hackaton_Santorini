@@ -8,6 +8,27 @@ function Board(initSquaresList, initPlayersList) {
     let activePlayer = null;
     let playersList = initPlayersList;
     let squaresList = initSquaresList;
+    let myPlayer = null;
+    let step = 0;
+
+    this.setMyPlayer = function (player) {
+        if (!player instanceof Player)
+            throw new BoardException('The parameter must be instance of Player.');
+
+        myPlayer = player;
+    }
+
+    this.getStep = function () {
+        return step;
+    }
+
+    this.setStep = function (newStep) {
+        step = newStep;
+    }
+
+    this.getMyPlayer = function () {
+        return myPlayer;
+    }
 
     this.sendMove = function (tokenId, squareId) {
         let token = activePlayer.findTokenById(tokenId);
@@ -47,13 +68,12 @@ function Board(initSquaresList, initPlayersList) {
 
     }
 
-    this.sendPositionToken = function(tokenId, squareId) {
-        let token = activePlayer.findTokenById(tokenId);
+    this.sendPositionToken = function(squareId) {
         let square = this.findSquareBycoord(squareId);
 
-        if(token !== null && square !== null) {
+        if(square !== null) {
             try {
-                SocketIoUtils.sendPositionToken(token, square);
+                SocketIoUtils.sendPositionToken(square);
             } catch (error) {
                 console.log(error.message);
             }
@@ -135,11 +155,12 @@ function Board(initSquaresList, initPlayersList) {
 
 // Parse un objet 
 Board.parse = function (board) {
+    let boardParsed = JSON.parse(board);
     let squaresList = [];
-    let squaresObjList = board.squaresList;
+    let squaresObjList = boardParsed.squaresList;
 
     let playersList = [];
-    let playersObjList = board.playersList;
+    let playersObjList = boardParsed.playersList;
 
     for(let squareJson of squaresObjList) {
         squaresList.push(Square.parse(squareJson));

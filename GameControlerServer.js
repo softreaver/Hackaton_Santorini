@@ -107,6 +107,11 @@ io.on('connection', function (socket) {
     } else {
         console.log("SESSION ==>> " + socket.handshake.session.userPseudo);
         socket.emit('message', 'bon retour dans la partie ' + socket.handshake.session.userPseudo);
+        if (boardServer.hasGameStarted()) {
+            sendBoard(socket);
+            setTimeout(sendTurnSignal, 100);
+        }
+            
     }
 
     // Evenement pour la méthode moveToken
@@ -135,15 +140,14 @@ io.on('connection', function (socket) {
         }  
     });
     // Positionnementd'un pion
-    socket.on('positionToken', (tokenJson, squareJson, ret) => {
-        console.log("[Position token] => token = " + tokenJson + " square = " + squareJson);
+    socket.on('positionToken', (squareJson, ret) => {
+        console.log("[Position token] => square = " + squareJson);
 
         if(boardServer.getStep() === 0) {
-            let parsedToken = JSON.parse(tokenJson);
             let parsedSquare = JSON.parse(squareJson);
     
             try {
-                boardServer.positionToken(parsedToken, parsedSquare);
+                let tokenJson = boardServer.positionToken(parsedSquare);
                 socket.broadcast.emit('positionToken', tokenJson, squareJson);
                 console.log('[OK]');
                 ret('ok', {tokenJson: tokenJson, squareJson: squareJson});
@@ -193,7 +197,7 @@ io.on('connection', function (socket) {
         if(!boardServer) {
             console.log(`[Init game] => board = ` + boardJson);
 
-            boardServer = BoardServer.parse(JSON.parse(boardJson));
+            boardServer = BoardServer.parse(boardJson);
             socket.emit('whoareyou', pseudo => {
                 try {
                     boardServer.addPlayer(socket.id, pseudo);
@@ -224,14 +228,21 @@ function startGame() {
     boardServer.setActivePlayer();
     boardServer.setGameStarted(true);
 
+    // Envoyer la board prête aux joueurs
+    sendBoard();
+
     // Envoyer le signal de tour aux joueurs
     sendTurnSignal();
 }
 
 function sendTurnSignal(socket = null) {
     console.log(boardServer.findOtherPlayer().getPseudo());
-    io.sockets.connected[boardServer.getActivePlayer().getID()].emit('yourTurn');
-    io.sockets.connected[boardServer.findOtherPlayer().getID()].emit('OpponentTurn');
+
+    if(typeof io.sockets.connected[boardServer.getActivePlayer().getID()] !== 'undefined')
+        io.sockets.connected[boardServer.getActivePlayer().getID()].emit('yourTurn');
+
+    if(typeof io.sockets.connected[boardServer.findOtherPlayer().getID()] !== 'undefined')
+        io.sockets.connected[boardServer.findOtherPlayer().getID()].emit('OpponentTurn');
 
     switch(boardServer.getStep()) {
         case 0:
@@ -255,4 +266,9 @@ function sendTurnSignal(socket = null) {
                 socket.emit('buildStep');
             break;
     }
+}
+
+function sendBoard(socket = null) {
+    let destination = socket || io.sockets;
+    destination.emit('board', BoardServer.stringify(boardServer));
 }

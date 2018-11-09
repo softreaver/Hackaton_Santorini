@@ -27,6 +27,14 @@ function BoardServer(initSquaresList, initPlayersList) {
             activePlayer = player;
     }
 
+    this.getSquaresList = function () {
+        return squaresList;
+    }
+
+    this.getPlayersList = function () {
+        return playersList;
+    }
+
     this.getStep = function() {
         return step;
     }
@@ -162,13 +170,13 @@ function BoardServer(initSquaresList, initPlayersList) {
         }
     }
 
-    this.positionToken = function(parsedToken, parsedSquare) {
+    this.positionToken = function(parsedSquare) {
         // Vérifier qu'il y a un joueur courant
         if (activePlayer === null)
             throw new BoardServerException("ActivePlayer is null");
 
         // Récupérer le token du joueur courant
-        let token = activePlayer.getTokenById(parsedToken.ID);
+        let token = activePlayer.getNextAvailableToken();
 
         // Récupérer le square du plateau
         let square = this.getSquare(parsedSquare);
@@ -182,6 +190,8 @@ function BoardServer(initSquaresList, initPlayersList) {
                     if(token.getSquareID() === null) {
                         square.setToken(token);
                         token.setSquareID(square.getID());
+
+                        return Token.stringify(token);
                     } else {
                         throw new BoardServerException("The token is already on the board", "Placement impossible, le pion a déjà été placé sur le plateau.");
                     }
@@ -193,7 +203,7 @@ function BoardServer(initSquaresList, initPlayersList) {
                 throw new BoardServerException("Square is null", "La case n'existe pas.");
             }
         } else {
-            throw new BoardServerException("Token is null", "Le pion n'existe pas.");
+            throw new BoardServerException("Token is null", "Aucun pion de disponible.");
         }
     }
 
@@ -333,11 +343,12 @@ function BoardServer(initSquaresList, initPlayersList) {
 
 // Parse un objet 
 BoardServer.parse = function (board) {
+    let boardParsed = JSON.parse(board);
     let squaresList = [];
-    let squaresObjList = board.squaresList;
+    let squaresObjList = boardParsed.squaresList;
 
     let playersList = [];
-    let playersObjList = board.playersList;
+    let playersObjList = boardParsed.playersList;
 
     for(let squareJson of squaresObjList) {
         squaresList.push(Square.parse(squareJson));
@@ -348,7 +359,7 @@ BoardServer.parse = function (board) {
     }
 
     let newBoard = new BoardServer(squaresList, playersList);
-    newBoard.setActivePlayer(null);
+    newBoard.setActivePlayer(board.activePlayer);
 
     return newBoard;
 }

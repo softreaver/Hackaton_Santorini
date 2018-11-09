@@ -9,6 +9,10 @@ window.onload = () => GameControler.initGame();
     let privates = {};
     privates.board = null;
 
+    publics.setBoard = function(board) {
+        privates.board = board;
+    }
+
     publics.initGame = function () {
         // Connexion socket au serveur
         SocketIoUtils.connect();
@@ -37,14 +41,6 @@ window.onload = () => GameControler.initGame();
         console.log("Jeu initialisé.")
     };
 
-    publics.moveToken = function () {
-
-    };
-
-    publics.build = function () {
-
-    };
-
     publics.victory = function () {
 
     };
@@ -57,20 +53,45 @@ window.onload = () => GameControler.initGame();
 
     };
 
-    publics.yourTurn = function () {
+    publics.positionStep = function () {
+        privates.board.setStep(0);
+    }
 
+    publics.moveStep = function () {
+        privates.board.setStep(1);
+    }
+
+    publics.buildStep = function () {
+        privates.board.setStep(2);
+    }
+
+    publics.yourTurn = function () {
+        let squaresListElt = document.querySelectorAll(".squares");
+        squaresListElt.forEach(element => {
+            element.addEventListener('click', function (e){
+                privates.click(e.currentTarget.id);
+            });
+        });
      };
 
     publics.opponentTurn = function () {
-        
+        let squaresListElt = document.querySelectorAll(".squares");
+        squaresListElt.forEach(element => {
+            let elClone = element.cloneNode(true);
+            element.parentNode.replaceChild(elClone, element);
+        });
     };
 
+    
+/*
     // On écoute les evennements de l'IHM
-    let squaresListElt = document.querySelectorAll(".squares")
+    let squaresListElt = document.querySelectorAll(".squares");
     squaresListElt.forEach(element => {
         element.addEventListener('click', function (e){
             let getIdSquare = e.currentTarget.id ;
-            let childElt = document.querySelector(`#${getIdSquare}`).firstChild;
+            let childElt = e.currentTarget.firstElementChild;
+
+
 
             if(childElt !== null) {
                 let hasToken = false;
@@ -81,29 +102,50 @@ window.onload = () => GameControler.initGame();
 
                 if(hasToken) {
                     squaresListElt.forEach(element =>{
-                        element.removeEventListener('Click');
+                        let elClone = element.cloneNode(true);
+                        element.parentNode.replaceChild(elClone, element);
 
                         let xDiff = (Number.parseInt(getIdSquare.substr(0,1))) - (Number.parseInt(element.id.substr(0,1)));
                         let yDiff = (Number.parseInt(getIdSquare.substr(2))) - (Number.parseInt(element.id.substr(2)));
 
                         if(xDiff >= -1 && xDiff <= 1 && yDiff >=1 && yDiff <= 1) {
-                            privates.board.sendMove(childElt.id, element.id);
+
+                            element.addEventListener('click', () => {
+                                privates.board.sendMove(childElt.id, element.id);
+                            });      
                         }
                     })
                 }
             }
         });
     });
+    */
 
-    publics.sendMove = function(tokenId, squareId) {
+    privates.click = function (squareId, tokenId) {
+        switch(privates.board.getStep()) {
+            case 0:
+                privates.positionToken(squareId)
+                break;
+
+            case 1:
+            privates.sendMove(tokenId, squareId);
+                break;
+
+            case 2:
+                privates.sendBuild(tokenId, squareId); 
+                break;
+        }
+    }
+
+    privates.sendMove = function(tokenId, squareId) {
         privates.board.sendMove(tokenId, squareId);
     }
 
-    publics.sendBuild = function(tokenId, squareId) {
+    privates.sendBuild = function(tokenId, squareId) {
         privates.board.sendBuild(tokenId, squareId);
     }
 
-    publics.positionToken = function(tokenId, squareId) {
+    privates.positionToken = function(tokenId, squareId) {
         privates.board.sendPositionToken(tokenId, squareId);
     }
 

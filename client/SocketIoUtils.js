@@ -60,11 +60,10 @@ var SocketIoUtils = SocketIoUtils || {};
         });
     }
 
-    publics.sendPositionToken = function(token, square) {
-        let tokenJson = Token.stringify(token);
+    publics.sendPositionToken = function(square) {
         let squareJson = Square.stringify(square);
 
-        privates.socket.emit('positionToken', tokenJson, squareJson, (type, data) => {
+        privates.socket.emit('positionToken', squareJson, (type, data) => {
             if(type === 'ok') {
 
             } else {
@@ -91,7 +90,7 @@ var SocketIoUtils = SocketIoUtils || {};
     });
 
     // Positionnement d'un pion
-    privates.socket.on('positionToken', (tokenJson, squareJson) => {
+    privates.socket.on('positionToken', (squareJson) => {
         console.log('positionnement');
     });
 
@@ -108,11 +107,13 @@ var SocketIoUtils = SocketIoUtils || {};
     // Début de votre tour
     privates.socket.on('yourTurn', () => {
         console.log('yourTurn');
+        GameControler.yourTurn();
     });
 
     // Début du tour de l'adversaire
     privates.socket.on('opponentTurn', () => {
         console.log('opponent turn');
+        GameControler.opponentTurn();
     });
 
     // Victoir d'un joueur
@@ -128,21 +129,29 @@ var SocketIoUtils = SocketIoUtils || {};
     // Etape de positionnement
     privates.socket.on('positionStep', () => {
         console.log('Etape de positionnement');
+        GameControler.positionStep();
     });
 
     // Etape de déplacement
     privates.socket.on('moveStep', () => {
         console.log('Etape de déplacement');
+        GameControler.moveStep();
     });
 
     // Etape de construction
     privates.socket.on('buildStep', () => {
         console.log('Etape de construction');
+        GameControler.buildStep();
     });
 
     // Demande du pseudo de la part du serveur
     privates.socket.on('whoareyou', callBack => {
         let pseudo = prompt('Ton pseudo : ');
         callBack(pseudo);
+    });
+
+    // Reception de la board
+    privates.socket.on('board', boardJson => {
+        GameControler.setBoard(Board.parse(boardJson));
     });
 }(SocketIoUtils));
